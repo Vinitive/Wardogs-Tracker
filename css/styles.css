@@ -45,3 +45,8 @@
 .profile-attribution a{color:#b9ef5a;text-decoration:none}
 .profile-modal-open{overflow:hidden}
 @media(max-width:560px){.profile-modal-backdrop{padding:8px;align-items:flex-start}.profile-modal{max-height:calc(100vh - 16px);padding:16px;border-radius:13px}.profile-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.profile-role-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.profile-hero{gap:12px}.profile-avatar{width:64px;height:64px;flex-basis:64px}}
+
+/* Fallback is deliberately text-only; the primary mark is the official game-site logo. */
+.brand-fallback .brand-mark{display:none!important}
+.brand-fallback .brand-copy b{font-family:'Barlow Condensed',Impact,sans-serif;font-size:27px;letter-spacing:1.5px}
+.brand-fallback .brand-copy small{letter-spacing:2px}
