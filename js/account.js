@@ -33,7 +33,7 @@
     $('#my-account').scrollIntoView({ behavior:'smooth', block:'start' });
     $('#my-account-nav').classList.remove('hidden');
     $$('.nav-link').forEach(n => n.classList.toggle('active', n.dataset.page === 'my-account'));
-    $('#main-menu')?.classList.remove('open');
+    $('.main-nav')?.classList.remove('open');
   };
   const showHub = () => {
     $('#my-account').classList.add('hidden');
@@ -54,6 +54,7 @@
   document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
   $$('.auth-tab').forEach(b => b.addEventListener('click', () => setMode(b.dataset.authMode)));
   $('#account-back-button')?.addEventListener('click', showHub);
+  $('#my-account-nav')?.addEventListener('click', e => { e.preventDefault(); showDashboard(); });
   async function loadProfile(user) {
     currentProfile = null;
     const { data, error } = await client.from('community_profiles')
