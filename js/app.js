@@ -110,7 +110,7 @@
     return modal;
   }
   async function showPlayerProfile(id) {
-    if (!/^\\d{17}$/.test(String(id))) return;
+    if (!/^\d{17}$/.test(String(id))) return;
     const modal = ensureProfileModal();
     const content = $('#profile-modal-content');
     modal.hidden = false;
