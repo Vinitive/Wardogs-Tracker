@@ -57,9 +57,17 @@ Deno.serve(async (req) => {
 
   const claimedId = requestUrl.searchParams.get("openid.claimed_id") || "";
   const identity = requestUrl.searchParams.get("openid.identity") || "";
+  const returnTo = requestUrl.searchParams.get("openid.return_to") || "";
+  const endpoint = requestUrl.searchParams.get("openid.op_endpoint") || "";
+  const signedFields = (requestUrl.searchParams.get("openid.signed") || "").split(",");
+  const expectedReturnTo = new URL("/functions/v1/steam-link-callback", supabaseUrl);
+  expectedReturnTo.searchParams.set("state", state);
   const steamMatch = claimedId.match(/^https?:\/\/steamcommunity\.com\/openid\/id\/(\d{17})$/);
-  if (!steamMatch || identity !== claimedId) {
-    return redirect(siteUrl, "error", "Steam did not return a valid SteamID64.");
+  if (!steamMatch || identity !== claimedId ||
+      returnTo !== expectedReturnTo.toString() ||
+      endpoint !== "https://steamcommunity.com/openid/login" ||
+      !["claimed_id", "identity", "return_to", "response_nonce"].every(field => signedFields.includes(field))) {
+    return redirect(siteUrl, "error", "Steam did not return a valid, signed identity response.");
   }
 
   const openid = new URLSearchParams(requestUrl.searchParams);
