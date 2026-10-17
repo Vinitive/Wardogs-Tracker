@@ -5,7 +5,9 @@ A static, GitHub Pages-ready community dashboard using the WARDOGS dark tactical
 ## Included
 
 - Dashboard with community metrics, cash/gold/level leaderboard tabs, player search, and server status.
-- A local SVG community wordmark that does not rely on a third-party image host. It is a custom community mark, not the publisher's official logo.
+- Official WARDOGS logo image sourced from the game's official website, with a text-only fallback if the image host is unavailable.
+- In-site player profile panels showing public stats, role progression, and unlocks without redirecting users away from this site.
+- Leaderboard tabs for cash, gold, level, career XP, and unlock count.
 - Email/password sign-up, sign-in, sign-out, and display-name profile updates.
 - Optional SteamID64 input (must be 17 digits).
 - Responsive desktop/mobile layout.
@@ -49,7 +51,7 @@ Typing a SteamID64 is **not** proof that a user owns that Steam account. This fo
 - Public leaderboard requests use `https://wardogstracker.gg/api/v1/leaderboard?sort=cash|gold|level&limit=100&offset=0`.
 - Server status requests use `https://wardogsnow.com/api/public/v1/status`.
 - API availability, response fields, and cross-origin browser access are controlled by those services. If their field names or CORS policies differ, update `js/app.js` accordingly.
-- The directory currently shows public tracker leaderboard records, not a verified-only Supabase community directory. It does not claim that a public tracker account is verified.
+- The directory currently shows public tracker leaderboard records, not a verified-only Supabase community directory. Clicking a player opens their public stats inside this site. Data is read from the WARDOGS Tracker API, respects its public/private profile settings, and should be credited to WARDOGS Tracker.
 - This site does not yet provide cheat-report submissions, anti-cheat verdicts, private Steam inventory access, or automatic stats syncing into Supabase.
 
 ## Files
@@ -61,6 +63,5 @@ js/config.js
 js/supabase.js
 js/app.js
 js/account.js
-assets/wardogs-wordmark.svg
 README.md
 ```
