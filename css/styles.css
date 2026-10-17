@@ -70,3 +70,8 @@
 .account-settings h3{margin:9px 0}
 .account-settings-intro{margin-bottom:20px}
 @media(max-width:760px){.account-page-heading{align-items:flex-start;flex-direction:column}.account-dashboard-grid{grid-template-columns:1fr}.account-overview,.account-settings{padding:20px}}
+
+.steam-link-field{margin:18px 0 8px;padding:14px;border:1px solid var(--line);background:#0d120f}
+.steam-link-label{display:block;color:#9ca79c;font-size:9px;letter-spacing:1px;font-weight:700;margin-bottom:8px}
+.steam-link-field strong{display:block;color:var(--lime);font-size:12px;overflow-wrap:anywhere}
+.steam-link-field .form-note{margin:10px 0 12px}
