@@ -40,12 +40,9 @@ Deno.serve(async (req) => {
   if (signature.length !== expected.length) return redirect(siteUrl, "error", "The Steam link session was invalid. Try again.");
   const sigBytes = new TextEncoder().encode(signature);
   const expectedBytes = new TextEncoder().encode(expected);
-  if (!crypto.subtle.timingSafeEqual) {
-    // Deno's Web Crypto may not expose timingSafeEqual; constant-time comparison is unnecessary for this public redirect token.
-    if (signature !== expected) return redirect(siteUrl, "error", "The Steam link session was invalid. Try again.");
-  } else if (!crypto.subtle.timingSafeEqual(sigBytes, expectedBytes)) {
-    return redirect(siteUrl, "error", "The Steam link session was invalid. Try again.");
-  }
+  let diff = 0;
+  for (let i = 0; i < sigBytes.length; i++) diff |= sigBytes[i] ^ expectedBytes[i];
+  if (diff !== 0) return redirect(siteUrl, "error", "The Steam link session was invalid. Try again.");
 
   let stateData: { user_id: string; exp: number; nonce: string };
   try {
