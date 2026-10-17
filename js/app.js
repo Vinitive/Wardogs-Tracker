@@ -15,7 +15,7 @@
   async function loadLeaderboard(sort = state.sort) {
     state.sort = sort;
     $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.sort === sort));
-    const heading = $('#rank-value-heading'); if (heading) heading.textContent = ({cash:'CASH BALANCE',gold:'GOLD RESERVE',level:'PLAYER LEVEL'})[sort];
+    const heading = $('#rank-value-heading'); if (heading) heading.textContent = ({cash:'CASH BALANCE',gold:'GOLD RESERVE',level:'PLAYER LEVEL',xp:'CAREER XP',unlocks:'UNLOCKS'})[sort];
     const body = $('#leaderboard-body'); body.innerHTML = '<tr><td colspan="4" class="empty-cell">SYNCING TRACKER DATA…</td></tr>';
     try {
       const data = await fetchJson(`${cfg.playerApiBase}/leaderboard?sort=${encodeURIComponent(sort)}&limit=100&offset=0`);
@@ -69,7 +69,7 @@
     if (!rows.length) { body.innerHTML = '<tr><td colspan="4" class="empty-cell">NO PUBLIC RECORDS RETURNED.</td></tr>'; return; }
     body.innerHTML = rows.slice(0, 10).map((p, i) => {
       const name = playerName(p);
-      const value = pick(p, sort === 'cash' ? ['cash','money','balance','cashBalance','value'] : sort === 'gold' ? ['gold','goldBalance','gold_balance','value'] : ['wardogLevel','level','playerLevel','player_level','value'], null);
+      const value = pick(p, sort === 'cash' ? ['cash','money','balance','cashBalance','value'] : sort === 'gold' ? ['gold','goldBalance','gold_balance','value'] : sort === 'xp' ? ['careerXp','career_xp','xp','value'] : sort === 'unlocks' ? ['unlocks','unlockCount','unlock_count','value'] : ['wardogLevel','level','playerLevel','player_level','value'], null);
       const id = steamId(p);
       return `<tr><td><span class="rank-number ${i < 3 ? 'top' : ''}">#${String(p.rank ?? i+1).padStart(2,'0')}</span></td><td><div class="operator-cell"><span class="operator-avatar">${safe(String(name).trim().charAt(0).toUpperCase() || 'W')}</span><span>${safe(name)}</span></div></td><td class="value-cell">${sort === 'cash' && value !== null ? '$' : ''}${number(value)}</td><td><span class="online-tag">● ${id ? 'TRACKED' : 'PUBLIC'}</span></td></tr>`;
     }).join('');
