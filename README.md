@@ -5,18 +5,20 @@ A static, GitHub Pages-ready community dashboard using the WARDOGS dark tactical
 ## Included
 
 - Dashboard with community metrics, cash/gold/level leaderboard tabs, player search, and server status.
+- A local SVG community wordmark that does not rely on a third-party image host. It is a custom community mark, not the publisher's official logo.
 - Email/password sign-up, sign-in, sign-out, and display-name profile updates.
 - Optional SteamID64 input (must be 17 digits).
 - Responsive desktop/mobile layout.
 - Static deployment; no build step required.
 
-## Deploy to a new GitHub repository
+## Deploy with GitHub Pages
 
-1. Create a new repository on GitHub, for example `wardogs-community-hub`. Do **not** reuse the original repository if you want this to stay separate.
-2. Upload the contents of this folder to the repository root. `index.html` must be at the root.
-3. Open **Settings → Pages**, select **Deploy from a branch**, choose `main` and `/ (root)`, and save.
-4. Wait for GitHub Pages to publish the site, then copy its exact URL.
-5. In Supabase, open **Authentication → URL Configuration**. Set **Site URL** to the published site URL and add that URL to **Redirect URLs**. For a GitHub Pages project site, add the project URL and its auth callback path as needed; use the exact published origin/path rather than a guessed URL.
+This project is stored in the `Vinitive/Wardogs-Tracker` repository. The entry point is `index.html` at the repository root.
+
+1. Open **Settings → Pages** in this repository.
+2. Under **Build and deployment**, choose **Deploy from a branch**, select `main` and `/ (root)`, then save.
+3. Wait for GitHub Pages to publish the site, then open the URL shown in the Pages settings.
+4. In Supabase, open **Authentication → URL Configuration**. Set **Site URL** to the published site URL and add that exact URL to **Redirect URLs**. For a project site, use the full published URL including its repository path.
 
 ## Supabase setup
 
@@ -59,5 +61,6 @@ js/config.js
 js/supabase.js
 js/app.js
 js/account.js
+assets/wardogs-wordmark.svg
 README.md
 ```
