@@ -1,0 +1,2 @@
+[functions.steam-link-callback]
+verify_jwt = false
