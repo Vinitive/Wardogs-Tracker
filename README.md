@@ -9,7 +9,7 @@ A static, GitHub Pages-ready community dashboard using the WARDOGS dark tactical
 - In-site player profile panels showing public stats, role progression, and unlocks without redirecting users away from this site.
 - Leaderboard tabs for cash, gold, level, career XP, and unlock count.
 - Email/password sign-up, sign-in, sign-out, and display-name profile updates.
-- Optional SteamID64 input (must be 17 digits).
+- Secure Steam account linking through Steam OpenID 2.0, verified server-side by Supabase Edge Functions.
 - Responsive desktop/mobile layout.
 - Static deployment; no build step required.
 
@@ -42,9 +42,25 @@ The SQL already run for this project should provide these fields and RLS policie
 
 If Supabase requires email confirmation, a newly registered user may not have a session immediately. This starter build tells the user to confirm their email and sign in. Depending on your RLS rules, the profile insert may need to be created after first sign-in; if that happens, we should add a safe `ensure profile` step or database trigger. Do not disable RLS just to bypass this.
 
-## Important Steam verification limitation
+## Steam account linking
 
-Typing a SteamID64 is **not** proof that a user owns that Steam account. This form stores an unverified ID only. To securely verify Steam ownership, add a server-side Steam OpenID callback (for example a Supabase Edge Function) that validates the Steam response and then marks the profile verified. Do not let the browser set `steam_verified = true`.
+The repository includes two Supabase Edge Functions:
+
+- `steam-link-start`: requires a valid signed-in Supabase user and creates a short-lived signed state before redirecting to Steam.
+- `steam-link-callback`: validates the OpenID response directly with Steam, extracts the 17-digit SteamID64, rejects IDs already linked to another community account, and marks the profile verified using a server-side service-role client.
+
+**The functions must be deployed and configured in Supabase before the button can work.**
+
+1. Install the Supabase CLI and sign in: `supabase login`.
+2. Link this repository to the project: `supabase link --project-ref rizubtsdkjwbvtbnnhyi`.
+3. Set `SITE_URL` to the exact published GitHub Pages URL (including the repository path if applicable), and set `STEAM_LINK_SECRET` to a long random secret. Keep these as server-side secrets only:
+   `supabase secrets set SITE_URL="https://YOUR-PUBLISHED-SITE-URL" STEAM_LINK_SECRET="A-LONG-RANDOM-SECRET"`
+4. Deploy both functions:
+   `supabase functions deploy steam-link-start`
+   `supabase functions deploy steam-link-callback`
+5. Ensure `community_profiles` has `user_id` (unique/primary key), `display_name`, `steam_id64` (unique when not null), `steam_verified`, and `updated_at`. Keep RLS enabled. Only the callback function may set `steam_verified = true`.
+
+Steam linking verifies ownership of the Steam account, but does not itself provide WARDOGS game stats. Stats still depend on the public WARDOGS tracker API.
 
 ## Data/API notes
 
