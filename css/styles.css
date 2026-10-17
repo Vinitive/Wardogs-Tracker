@@ -50,3 +50,23 @@
 .brand-fallback .brand-mark{display:none!important}
 .brand-fallback .brand-copy b{font-family:'Barlow Condensed',Impact,sans-serif;font-size:27px;letter-spacing:1.5px}
 .brand-fallback .brand-copy small{letter-spacing:2px}
+
+/* Dedicated signed-in account dashboard */
+.account-page{margin:14px 0 24px;scroll-margin-top:96px}
+.account-page-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:18px}
+.account-page-heading h2{font:800 38px/.95 var(--font-head);margin:10px 0}
+.account-page-heading h2 span,.account-settings h3 span{color:var(--lime)}
+.account-page-heading p,.account-settings-intro{color:#98a498;font-size:11px;line-height:1.7}
+.account-dashboard-grid{display:grid;grid-template-columns:minmax(250px,.8fr) minmax(0,1.2fr);gap:14px}
+.account-overview,.account-settings{padding:25px}
+.account-overview-top{display:flex;gap:14px;align-items:center;margin-bottom:24px}
+.account-overview-top h3,.account-settings h3{font:800 26px/.95 var(--font-head);margin:7px 0}
+.account-overview-top p{font-size:11px;color:#98a498;overflow-wrap:anywhere;margin:0}
+.account-status-label{font-size:8px;letter-spacing:1.2px;color:var(--lime);font-weight:800}
+.account-detail-row{display:flex;justify-content:space-between;gap:14px;padding:15px 0;border-top:1px solid var(--line);font-size:9px;letter-spacing:.8px;color:#9ca79c}
+.account-detail-row b{color:#e8eee5;text-align:right}
+.account-detail-row .account-status-value{color:var(--lime)}
+.account-note{font-size:10px;line-height:1.8;color:#7f8d7e;margin:16px 0}
+.account-settings h3{margin:9px 0}
+.account-settings-intro{margin-bottom:20px}
+@media(max-width:760px){.account-page-heading{align-items:flex-start;flex-direction:column}.account-dashboard-grid{grid-template-columns:1fr}.account-overview,.account-settings{padding:20px}}
