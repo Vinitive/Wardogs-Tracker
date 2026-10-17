@@ -118,13 +118,11 @@
     try {
       if (mode === 'signup') {
         const displayName = $('#profile-name').value.trim() || 'WARDOGS Player';
-        const steamId = $('#steam-id').value.trim() || null;
-        if (steamId && !/^\d{17}$/.test(steamId)) throw new Error('SteamID64 must contain exactly 17 digits.');
         const { data, error } = await client.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + window.location.pathname } });
         if (error) throw error;
         if (data.user && data.session) {
           const { error: profileError } = await client.from('community_profiles').upsert(
-            { user_id: data.user.id, display_name: displayName, steam_id64: steamId },
+            { user_id: data.user.id, display_name: displayName },
             { onConflict:'user_id' }
           );
           if (profileError) throw profileError;
