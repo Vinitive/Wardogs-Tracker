@@ -89,16 +89,60 @@
       const gold = pick(p,['gold','goldBalance','gold_balance'],null);
       const id = steamId(p);
       const avatar = pick(p,['avatarUrl','avatar_url'],'');
-      const profileUrl = id ? `https://wardogstracker.gg/profile/${encodeURIComponent(id)}` : '';
-      const avatarHtml = avatar ? `<img class="player-avatar-img" src="${safe(avatar)}" alt="" loading="lazy" onerror="this.style.display='none'">` : `<span class="operator-avatar">${safe(String(name).trim().charAt(0).toUpperCase() || 'W')}</span>`;
       const details = [level !== null ? `LVL ${number(level)}` : '', cash !== null ? `$${number(cash)}` : '', gold !== null ? `${number(gold)} GOLD` : ''].filter(Boolean).join(' · ');
-      return `<article class="player-card" ${profileUrl ? `role="link" tabindex="0" data-profile-url="${safe(profileUrl)}" aria-label="Open ${safe(name)} public tracker profile"` : ''}>${avatarHtml}<div class="player-info"><b>${safe(name)}</b><small>${safe(details || (id ? `STEAMID64 ${id}` : 'PUBLIC TRACKER PROFILE'))}</small>${id ? `<small>STEAMID64 ${safe(id)}</small>` : ''}</div><span class="player-level">${level !== null ? `L${safe(level)}` : 'WG'}</span></article>`;
+      const avatarHtml = avatar ? `<img class="player-avatar-img" src="${safe(avatar)}" alt="" loading="lazy" onerror="this.style.display='none'">` : `<span class="operator-avatar">${safe(String(name).trim().charAt(0).toUpperCase() || 'W')}</span>`;
+      return `<article class="player-card" ${id ? `role="button" tabindex="0" data-player-id="${safe(id)}" aria-label="View stats for ${safe(name)}"` : ''}>${avatarHtml}<div class="player-info"><b>${safe(name)}</b><small>${safe(details || (id ? 'VIEW PLAYER STATS' : 'PUBLIC TRACKER PROFILE'))}</small>${id ? `<small>STEAMID64 ${safe(id)}</small>` : ''}</div><span class="player-level">${level !== null ? `L${safe(level)}` : 'WG'}</span></article>`;
     }).join('') + (filtered.length > visible.length ? `<div class="empty-card">Showing ${number(visible.length)} of ${number(filtered.length)} matches. Refine your search to narrow the results.</div>` : '');
-    grid.querySelectorAll('[data-profile-url]').forEach(card => {
-      const open = () => window.open(card.dataset.profileUrl, '_blank', 'noopener,noreferrer');
+    grid.querySelectorAll('[data-player-id]').forEach(card => {
+      const open = () => showPlayerProfile(card.dataset.playerId);
       card.addEventListener('click', open);
       card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
     });
+  }
+  function ensureProfileModal() {
+    let modal = $('#player-profile-modal');
+    if (modal) return modal;
+    document.body.insertAdjacentHTML('beforeend', `<div class="profile-modal-backdrop" id="player-profile-modal" hidden><section class="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-name"><button class="profile-modal-close" type="button" aria-label="Close player profile">×</button><div id="profile-modal-content"><div class="empty-card">Loading operator profile…</div></div><p class="profile-attribution">Public stats provided by <a href="https://wardogstracker.gg" target="_blank" rel="noopener noreferrer">WARDOGS Tracker</a>.</p></section></div>`);
+    modal = $('#player-profile-modal');
+    modal.querySelector('.profile-modal-close').addEventListener('click', () => { modal.hidden = true; document.body.classList.remove('profile-modal-open'); });
+    modal.addEventListener('click', e => { if (e.target === modal) { modal.hidden = true; document.body.classList.remove('profile-modal-open'); } });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) { modal.hidden = true; document.body.classList.remove('profile-modal-open'); } });
+    return modal;
+  }
+  async function showPlayerProfile(id) {
+    if (!/^\\d{17}$/.test(String(id))) return;
+    const modal = ensureProfileModal();
+    const content = $('#profile-modal-content');
+    modal.hidden = false;
+    document.body.classList.add('profile-modal-open');
+    content.innerHTML = '<div class="empty-card">SYNCING OPERATOR RECORD…</div>';
+    try {
+      const data = await fetchJson(`${cfg.playerApiBase}/players/${encodeURIComponent(id)}`);
+      const p = data.player || data;
+      const stats = p.stats || {};
+      const roles = stats.roles && typeof stats.roles === 'object' ? Object.entries(stats.roles) : [];
+      const statCard = (label, value) => `<div class="profile-stat"><small>${label}</small><b>${value}</b></div>`;
+      const cash = stats.cash == null ? 'Private' : '$' + number(stats.cash);
+      const gold = stats.gold == null ? 'Private' : number(stats.gold);
+      const avatar = p.avatarUrl ? `<img class="profile-avatar" src="${safe(p.avatarUrl)}" alt="" onerror="this.style.display='none'">` : '';
+      const roleMarkup = roles.length ? `<section class="profile-section"><h3>ROLE PROGRESSION</h3><div class="profile-role-grid">${roles.map(([key,val]) => `<div class="profile-role"><span>${safe(key)}</span><b>LVL ${number(val?.level)}</b><small>${number(val?.xp)} XP</small></div>`).join('')}</div></section>` : '';
+      content.innerHTML = `<div class="profile-hero">${avatar}<div><span class="profile-eyebrow">WARDOGS OPERATOR PROFILE</span><h2 id="profile-modal-name">${safe(p.name || 'Unknown Operator')}</h2><p>STEAMID64 ${safe(p.steamId || id)}</p><span class="profile-rank">${p.leaderboardRank ? 'GLOBAL RANK #' + number(p.leaderboardRank) : 'PUBLIC TRACKER PROFILE'}</span></div></div><div class="profile-stat-grid">${statCard('WARDOG LEVEL',number(stats.wardogLevel))}${statCard('CAREER XP',number(stats.careerXp))}${statCard('CASH',cash)}${statCard('GOLD',gold)}${statCard('UNLOCKS',number(stats.unlocks))}${statCard('ACHIEVEMENTS',number(p.achievements))}</div>${roleMarkup}<section class="profile-section"><h3>UNLOCKED ITEMS</h3><div id="profile-unlocks" class="profile-unlocks"><div class="empty-card">Loading unlock list…</div></div></section><div class="profile-updated">Last synced: ${stats.syncedAt ? safe(new Date(stats.syncedAt).toLocaleString()) : 'Not available'}</div>`;
+      try {
+        const unlockData = await fetchJson(`${cfg.playerApiBase}/players/${encodeURIComponent(id)}/unlocks`);
+        const unlocks = unlockData.unlocks;
+        const unlockEl = $('#profile-unlocks');
+        if (!unlocks || !Array.isArray(unlocks.items) || !unlocks.items.length) {
+          unlockEl.innerHTML = '<p class="profile-muted">Unlock list is private or not available.</p>';
+        } else {
+          unlockEl.innerHTML = `<div class="unlock-summary">${number(unlocks.total)} total · ${number(unlocks.matched)} identified</div><div class="unlock-chip-grid">${unlocks.items.slice(0,60).map(item => `<span class="unlock-chip">${safe(item.item?.name || String(item.gameId || 'Unknown item').split('.').pop())}</span>`).join('')}${unlocks.items.length > 60 ? `<span class="unlock-chip">+${number(unlocks.items.length-60)} more</span>` : ''}</div>`;
+        }
+      } catch (_) {
+        const unlockEl = $('#profile-unlocks');
+        if (unlockEl) unlockEl.innerHTML = '<p class="profile-muted">Unlock data is private or temporarily unavailable.</p>';
+      }
+    } catch (_) {
+      content.innerHTML = '<div class="empty-card">This player profile is private, unavailable, or has not synced stats yet.</div>';
+    }
   }
   function updateMetrics(sort, rows) {
     $('#metric-players').textContent = number(state.apiTotal || state.allPlayers.length || rows.length);
