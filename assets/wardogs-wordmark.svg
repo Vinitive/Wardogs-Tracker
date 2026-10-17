@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 74" role="img" aria-labelledby="title desc">
+  <title id="title">WARDOGS Community Hub</title>
+  <desc id="desc">A local text-based WARDOGS community wordmark.</desc>
+  <g fill="none" stroke="#b9ef5a" stroke-width="5" stroke-linejoin="miter">
+    <path d="M7 13h19l9 29 9-29h17l-16 48H28z"/>
+  </g>
+  <text x="76" y="42" fill="#f5f7f2" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="800" letter-spacing="1.5">WARDOGS</text>
+  <text x="78" y="62" fill="#aab2a6" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" letter-spacing="3.2">COMMUNITY HUB</text>
+</svg>
