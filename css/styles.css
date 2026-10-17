@@ -11,3 +11,37 @@
 .footer-brand .brand-logo{width:160px;max-height:38px}
 .brand{min-width:0}
 @media(max-width:780px){.brand-logo{width:154px;max-height:38px}.footer-brand .brand-logo{width:150px}}
+
+
+/* In-site operator profile panel */
+.player-card[data-player-id]{cursor:pointer}
+.player-card[data-player-id]:focus-visible{outline:2px solid var(--accent,#b9ef5a);outline-offset:3px}
+.profile-modal-backdrop{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(2,5,4,.82);backdrop-filter:blur(10px);overflow-y:auto}
+.profile-modal-backdrop[hidden]{display:none}
+.profile-modal{position:relative;width:min(820px,100%);max-height:min(90vh,900px);overflow-y:auto;padding:clamp(20px,4vw,34px);border:1px solid rgba(185,239,90,.25);border-radius:18px;background:#101511;color:#f3f5ef;box-shadow:0 28px 100px rgba(0,0,0,.6)}
+.profile-modal-close{position:sticky;float:right;top:0;z-index:2;width:38px;height:38px;border:1px solid #3b4439;border-radius:9px;background:#1b231c;color:#f3f5ef;font-size:28px;line-height:1;cursor:pointer}
+.profile-hero{display:flex;align-items:center;gap:18px;margin:4px 44px 24px 0}
+.profile-avatar{width:84px;height:84px;flex:0 0 84px;object-fit:cover;border-radius:12px;border:1px solid #3d4937}
+.profile-eyebrow{font-size:10px;letter-spacing:2px;color:#b9ef5a;font-weight:800}
+.profile-hero h2{margin:6px 0;font-size:clamp(26px,5vw,38px);line-height:1.05}
+.profile-hero p,.profile-muted{color:#a8b0a5;font-size:12px;overflow-wrap:anywhere}
+.profile-rank{display:inline-block;margin-top:5px;padding:5px 8px;border-radius:5px;background:rgba(185,239,90,.1);color:#b9ef5a;font-size:10px;font-weight:800;letter-spacing:1px}
+.profile-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.profile-stat{padding:15px;border:1px solid #293128;border-radius:10px;background:#151c16;min-width:0}
+.profile-stat small,.profile-role small{display:block;color:#98a293;font-size:10px;letter-spacing:1px;font-weight:700}
+.profile-stat b{display:block;margin-top:8px;font-size:clamp(16px,3vw,23px);overflow-wrap:anywhere}
+.profile-section{margin-top:25px}
+.profile-section h3{font-size:12px;letter-spacing:1.8px;color:#b9ef5a;margin:0 0 12px}
+.profile-role-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.profile-role{padding:12px;border:1px solid #293128;border-radius:9px;background:#151c16}
+.profile-role span{display:block;text-transform:uppercase;font-size:11px;color:#d7ded1;font-weight:800}
+.profile-role b{display:block;margin:7px 0;font-size:15px}
+.profile-role small{letter-spacing:.3px}
+.unlock-summary{font-size:12px;color:#a8b0a5;margin-bottom:10px}
+.unlock-chip-grid{display:flex;flex-wrap:wrap;gap:7px}
+.unlock-chip{padding:7px 10px;border:1px solid #303a2e;border-radius:6px;background:#151c16;font-size:11px;color:#e0e6db}
+.profile-updated{margin-top:20px;color:#849080;font-size:11px}
+.profile-attribution{border-top:1px solid #293128;padding-top:13px;margin:24px 0 0;color:#859080;font-size:11px}
+.profile-attribution a{color:#b9ef5a;text-decoration:none}
+.profile-modal-open{overflow:hidden}
+@media(max-width:560px){.profile-modal-backdrop{padding:8px;align-items:flex-start}.profile-modal{max-height:calc(100vh - 16px);padding:16px;border-radius:13px}.profile-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.profile-role-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.profile-hero{gap:12px}.profile-avatar{width:64px;height:64px;flex-basis:64px}}
