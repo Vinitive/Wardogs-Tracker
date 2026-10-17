@@ -1,7 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+const siteOrigin = (() => { try { return new URL(Deno.env.get("SITE_URL") || "").origin; } catch { return "*"; } })();
 const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("SITE_URL") || "*",
+  "Access-Control-Allow-Origin": siteOrigin,
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Content-Type": "application/json",
@@ -52,7 +53,7 @@ Deno.serve(async (req) => {
   const state = payload + "." + signature;
   const callback = new URL("/functions/v1/steam-link-callback", supabaseUrl);
   callback.searchParams.set("state", state);
-  const realm = new URL(siteUrl).origin;
+  const realm = new URL(supabaseUrl).origin;
 
   const steam = new URL("https://steamcommunity.com/openid/login");
   steam.searchParams.set("openid.ns", "http://specs.openid.net/auth/2.0");
