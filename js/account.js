@@ -5,6 +5,7 @@
   let mode = 'signup';
   let currentUser = null;
   let currentProfile = null;
+  const cfg = window.WARDOGS_CONFIG || {};
   const modal = $('#account-modal');
   const msg = (text, error = false) => {
     const el = $('#auth-message');
@@ -72,7 +73,9 @@
     $('#dashboard-display-name').textContent = displayName;
     $('#dashboard-email').textContent = user.email || 'Signed-in operator';
     $('#dashboard-name-input').value = profile?.display_name || '';
-    $('#dashboard-steam-input').value = profile?.steam_id64 || '';
+    $('#dashboard-steam-id').textContent = profile?.steam_id64 || 'NOT LINKED';
+    $('#steam-link-button').textContent = profile?.steam_verified ? 'STEAM ACCOUNT LINKED ✓' : 'LINK STEAM ACCOUNT ↗';
+    $('#steam-link-button').disabled = !!profile?.steam_verified;
     $('#dashboard-steam-status').textContent = profile?.steam_verified ? 'VERIFIED' : 'NOT VERIFIED';
     $('#account-button').innerHTML = 'MY ACCOUNT <span>↗</span>';
     $('#my-account-nav').classList.remove('hidden');
@@ -154,14 +157,44 @@
     await refreshAccount();
     window.wardogsToast?.('Display name saved.');
   });
+
+  $('#steam-link-button').addEventListener('click', async () => {
+    const button = $('#steam-link-button');
+    const status = $('#steam-link-message');
+    if (!client) { status.textContent = 'Supabase is not configured.'; status.classList.add('error'); return; }
+    const { data: { session } } = await client.auth.getSession();
+    if (!session?.access_token) { status.textContent = 'Sign in again before linking Steam.'; status.classList.add('error'); return; }
+    button.disabled = true;
+    button.textContent = 'CONNECTING TO STEAM…';
+    status.textContent = 'Opening Steam’s official sign-in page…';
+    status.classList.remove('error');
+    try {
+      const response = await fetch(`${cfg.supabaseUrl}/functions/v1/steam-link-start`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': cfg.supabasePublishableKey
+        },
+        body: JSON.stringify({})
+      });
+      const result = await response.json();
+      if (!response.ok || !result.url) throw new Error(result.error || 'Could not start Steam linking.');
+      window.location.assign(result.url);
+    } catch (error) {
+      status.textContent = error.message || 'Steam linking failed to start.';
+      status.classList.add('error');
+      button.disabled = false;
+      button.textContent = 'LINK STEAM ACCOUNT ↗';
+    }
+  });
+
   $('#dashboard-profile-form').addEventListener('submit', async e => {
     e.preventDefault();
     if (!client || !currentUser) { dashboardMsg('Your session expired. Sign in again.', true); return; }
     const name = $('#dashboard-name-input').value.trim() || 'WARDOGS Player';
-    const steamId = $('#dashboard-steam-input').value.trim() || null;
-    if (steamId && !/^\d{17}$/.test(steamId)) { dashboardMsg('SteamID64 must contain exactly 17 digits.', true); return; }
     dashboardMsg('SAVING PROFILE…');
-    const payload = { user_id: currentUser.id, display_name: name, steam_id64: steamId };
+    const payload = { user_id: currentUser.id, display_name: name };
     const { error } = await client.from('community_profiles').upsert(payload, { onConflict:'user_id' });
     if (error) { dashboardMsg('Could not save profile: ' + error.message, true); return; }
     const { data: { user } } = await client.auth.getUser();
@@ -186,4 +219,18 @@
   $('#dashboard-signout-button').addEventListener('click', signOut);
   client?.auth.onAuthStateChange(() => { setTimeout(refreshAccount, 0); });
   refreshAccount();
+  const params = new URLSearchParams(window.location.search);
+  const steamResult = params.get('steam_link');
+  if (steamResult) {
+    const detail = params.get('steam_message') || (steamResult === 'success' ? 'Steam account linked.' : 'Steam linking failed.');
+    window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+    setTimeout(async () => {
+      await refreshAccount();
+      showDashboard();
+      const status = $('#steam-link-message');
+      status.textContent = detail;
+      status.classList.toggle('error', steamResult !== 'success');
+      if (steamResult === 'success') window.wardogsToast?.('Steam account linked and verified.');
+    }, 250);
+  }
 })();
